@@ -98,7 +98,7 @@ def draw_display():
 
 # Fungsi untuk menggerakkan ular
 def move_snake():
-    global snake, snake_dir, food, score, collision, r, g, b, level
+    global snake, snake_dir, food, score, collision, r, g, b, level, interval
 
     # Perbarui posisi kepala ular berdasarkan arah
     new_head = (snake[0][0] + snake_dir[0], snake[0][1] + snake_dir[1])
@@ -141,6 +141,15 @@ def move_snake():
     snake.insert(0, new_head)
 
 
+def reset_game():
+    global snake, snake_dir, food, score, collision, r, g, b, level, interval
+    snake = [(40, 40), (39, 40), (38, 40)]
+    snake_dir = (1, 0)
+    interval = 300
+    food = [(25, 25)]
+    collision = False
+
+
 # Fungsi callback untuk mengatur logika permainan
 def game_logic(value):
     global interval, collision
@@ -150,6 +159,10 @@ def game_logic(value):
 
     glutTimerFunc(interval, game_logic, 0)
     glutPostRedisplay()
+
+    # Reset collision status when the snake collides
+    if collision:
+        reset_game()
 
 # Fungsi callback untuk menanggapi input kursor panah
 def special_key_input(key, x, y):
