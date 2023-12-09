@@ -196,7 +196,7 @@ def move_snake():
     # Hapus ekor ular jika panjang ular lebih dari skor
     if len(snake) > score + 2:
         snake.pop()
-
+        
 def reset_game():
     global snake, level, snake_dir, interval, food, red_food, state, current_direction, score, collision, r, g, b
     snake = [(25, 7), (25, 6), (25, 5)]
