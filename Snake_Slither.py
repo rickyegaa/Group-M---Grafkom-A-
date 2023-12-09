@@ -14,6 +14,7 @@ level = 1
 snake_dir = (0, 1)
 interval = 300
 food = [(25, 25)]
+red_food = [(randrange(3, 47), randrange(3, 45)) for _ in range(5)] # Tambahkan variabel untuk makanan merah
 state = 'up'
 current_direction = (0, 1)
 score = 0
@@ -122,11 +123,15 @@ def draw_snake():
     else:
         r, g, b = 1, 1, 1
 
-
 # Fungsi untuk Menggambar Makanan Ular
 def draw_food():
     glColor3f(1, 1, 0)
     draw_rect(food[0][0], food[0][1], 1, 1)
+
+def draw_all_red_food():
+    glColor3f(1, 0, 0)
+    for pos in red_food:
+        draw_rect(pos[0], pos[1], 1, 1)
 
 # Fungsi Untuk Menggambar Semua Elemen Tampilan Permainan Seperti Makanan, Ular, Skor, dan Batasan Bidang.
 def draw_display():
@@ -135,19 +140,23 @@ def draw_display():
     glLoadIdentity()
     custom_2D_gameWindow(field_width, field_height)
     draw_food()
+    draw_all_red_food()  # Tambahkan pemanggilan untuk menggambar makanan merah
     draw_snake()
     board()
     score_display()
     glutSwapBuffers()
 
 def move_snake():
-    global snake, snake_dir, food, score, collision, r, g, b, level, interval
+    global snake, snake_dir, food, score, collision, r, g, b, level, interval, red_food
 
     # Perbarui posisi kepala ular berdasarkan arah
     new_head = (snake[0][0] + snake_dir[0], snake[0][1] + snake_dir[1])
 
     # Cek tabrakan dengan dinding
-    if snake[0][0] == 2 or snake[0][0] == 47 or snake[0][1] == 2 or snake[0][1] == 45:
+    if (
+        new_head[0] == 2 or new_head[0] == 47 or
+        new_head[1] == 2 or new_head[1] == 45
+    ):
         collision = True
 
     # Cek tabrakan dengan tubuh ular
@@ -175,22 +184,27 @@ def move_snake():
         # Posisi makanan baru harus di dalam dinding
         food = [(randrange(3, 47), randrange(3, 45))]
 
+    # Cek apakah ular memakan makanan merah
+    if new_head in red_food:
+        score = max(0, score - 1)
+        red_food.remove(new_head)
+        red_food.append((randrange(3, 47), randrange(3, 45)))
+
     # Tambahkan kepala baru pada posisi depan
     snake.insert(0, new_head)
 
     # Hapus ekor ular jika panjang ular lebih dari skor
     if len(snake) > score + 2:
         snake.pop()
-
-
-
+        
 def reset_game():
-    global snake, level, snake_dir, interval, food, state, current_direction, score, collision, r, g, b
+    global snake, level, snake_dir, interval, food, red_food, state, current_direction, score, collision, r, g, b
     snake = [(25, 7), (25, 6), (25, 5)]
     level = 1
     snake_dir = (0, 1)
     interval = 300
     food = [(25, 25)]
+    red_food = [(randrange(3, 47), randrange(3, 45))]  # Tambahkan makanan merah pada reset
     state = 'up'
     current_direction = (0, 1)
     score = 0
@@ -206,7 +220,7 @@ def draw_game_over_display():
 
 # Fungsi callback untuk mengatur logika permainan
 def game_logic(value):
-    global interval, collision
+    global interval, collision, red_food
 
     if not collision:
         move_snake()
