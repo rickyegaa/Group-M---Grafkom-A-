@@ -3,6 +3,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from random import randrange
 from time import sleep
+import pygame
+from pygame import mixer
 
 # Inisialisasi Variabel
 window = 0
@@ -21,6 +23,17 @@ score = 0
 collision = False
 r, g, b = 1, 1, 1
 high_score = 0
+pygame.init()
+mixer.init()
+
+# Load suara ular memakan makanan Kuning
+eating_sound = mixer.Sound("./Assets/Beep1.wav")
+
+# Load suara ular memakan makanan Merah
+eating_sound2 = mixer.Sound("./Assets/Beep.wav")  
+
+# Load suara ular menabrak dinding
+collision_sound = mixer.Sound("./Assets/gameOver.wav") 
 
 # Fungsi Untuk Mengatur Tampilan 2D Pada Jendela Permainan
 def custom_2D_gameWindow(internal_width, internal_height):
@@ -146,6 +159,18 @@ def draw_display():
     score_display()
     glutSwapBuffers()
 
+# Fungsi untuk memutar suara makanan saat ular memakan makanan kuning
+def play_eating_sound():
+    eating_sound.play()
+
+# Fungsi untuk memutar suara makanan saat ular memakan makanan merah
+def play_eating_sound2():    
+    eating_sound2.play()
+
+# Fungsi untuk memutar suara tabrakan saat ular menabrak dinding
+def play_collision_sound():
+    collision_sound.play()
+
 def move_snake():
     global snake, snake_dir, food, score, collision, r, g, b, level, interval, red_food
 
@@ -158,6 +183,7 @@ def move_snake():
         new_head[1] == 2 or new_head[1] == 45
     ):
         collision = True
+        play_collision_sound()
 
     # Cek tabrakan dengan tubuh ular
     head = snake[0]
@@ -175,6 +201,7 @@ def move_snake():
     # Cek apakah ular memakan makanan
     if new_head == food[0]:
         score += 1
+        play_eating_sound()
 
         # Jika skor adalah kelipatan 5, tingkatkan level
         if score % 5 == 0:
@@ -187,6 +214,7 @@ def move_snake():
     # Cek apakah ular memakan makanan merah
     if new_head in red_food:
         score = max(0, score - 1)
+        play_eating_sound2()
         red_food.remove(new_head)
         red_food.append((randrange(3, 47), randrange(3, 45)))
 
