@@ -102,6 +102,14 @@ def draw_rect(x, y, width, height):
 # Fungsi Untuk Menggambar Seluruh Tubuh Ular
 def draw_snake():
     global r, g, b
+    for i, (x, y) in enumerate(snake):
+        # Hitung warna berdasarkan indeks segmen
+        segment_color = (1 - i / len(snake), g, b)
+
+        # Set warna untuk segmen saat ini
+        glColor3f(*segment_color)
+        draw_rect(x, y, 1, 1)
+
     head = snake[0]
 
     # Cek apakah kepala ular menabrak dinding atau tubuhnya sendiri
@@ -112,11 +120,8 @@ def draw_snake():
     ):
         r, g, b = 1, 0, 0  
     else:
-        r, g, b = 1, 1, 1 
+        r, g, b = 1, 1, 1
 
-    glColor3f(r, g, b)
-    for x, y in snake:
-        draw_rect(x, y, 1, 1)
 
 # Fungsi untuk Menggambar Makanan Ular
 def draw_food():
@@ -135,7 +140,6 @@ def draw_display():
     score_display()
     glutSwapBuffers()
 
-# Fungsi untuk menggerakkan ular
 def move_snake():
     global snake, snake_dir, food, score, collision, r, g, b, level, interval
 
@@ -150,8 +154,14 @@ def move_snake():
     head = snake[0]
     for i in range(1, len(snake)):
         body = snake[i]
-        if head[0] == body[0] and head[1] == body[1]:
-            collision = True
+        if new_head == body:
+            # Ular bertabrakan dengan tubuhnya sendiri
+            # Kurangi panjang ular menjadi 1
+            snake = [new_head]
+            
+            # Kurangi skor sebanyak 1
+            score = max(0, score - 1)
+            break
 
     # Cek apakah ular memakan makanan
     if new_head == food[0]:
@@ -171,6 +181,7 @@ def move_snake():
     # Hapus ekor ular jika panjang ular lebih dari skor
     if len(snake) > score + 2:
         snake.pop()
+
 
 
 def reset_game():
