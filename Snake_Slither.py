@@ -241,7 +241,17 @@ def reset_game():
 
 # Fungsi untuk memutuskan apakah harus menampilkan layar game over pada tampilan permainan 
 def draw_game_over_display():
-    if collision:
+    if score >= 30:
+        # Tampilkan pesan Congratulations saat mencapai skor 30
+        glColor3f(0, 1, 0)
+        glRasterPos2f(field_width // 2 - 8, field_height // 2 + 2)
+        congrats_str = "Congratulations The Finish Game"
+        for char in congrats_str:
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, ord(char))
+        glutSwapBuffers()
+        sleep(5)
+        reset_game()
+    elif collision:
         game_over_display()
     else:
         draw_display()
@@ -255,6 +265,9 @@ def game_logic(value):
 
     glutTimerFunc(interval, game_logic, 0)
     glutPostRedisplay()
+
+    if collision or score >= 30:
+        draw_game_over_display()
 
     # Cek kondisi Game Over
     if collision:
